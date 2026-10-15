@@ -86,6 +86,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Seed Admin Credentials
+    |--------------------------------------------------------------------------
+    |
+    | Credentials for the initial administrator account created by the
+    | AdminUserSeeder. The account must change its password on first login.
+    |
+    */
+
+    'seed_admin_username' => env('SEED_ADMIN_USERNAME', 'admin'),
+
+    'seed_admin_password' => env('SEED_ADMIN_PASSWORD', 'password'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |
