@@ -69,6 +69,14 @@ class Student extends Model
     }
 
     /**
+     * @return HasMany<ReportCard, $this>
+     */
+    public function reportCards(): HasMany
+    {
+        return $this->hasMany(ReportCard::class);
+    }
+
+    /**
      * @return BelongsToMany<Guardian, $this>
      */
     public function guardians(): BelongsToMany
