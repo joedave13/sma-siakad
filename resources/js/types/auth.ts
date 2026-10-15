@@ -1,17 +1,16 @@
+export type UserRole = 'admin' | 'teacher' | 'student' | 'parent';
+
 export type User = {
     id: number;
     name: string;
-    email: string;
+    username: string;
+    email: string | null;
+    role: UserRole;
     avatar?: string;
-    email_verified_at: string | null;
-    two_factor_enabled?: boolean;
-    created_at: string;
-    updated_at: string;
-    [key: string]: unknown;
 };
 
 export type Auth = {
-    user: User;
+    user: User | null;
 };
 
 export type Passkey = {

@@ -2,7 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Role;
+use App\Models\SchoolProfile;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,13 +39,121 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $this->userPayload($user),
             ],
+            'school' => $this->schoolPayload(),
+            'nav' => $user === null ? [] : $this->navPayload($user->role),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
+    }
+
+    /**
+     * The subset of the user record the client is allowed to see.
+     *
+     * @return array{id: int, name: string, username: string, email: string|null, role: string}|null
+     */
+    private function userPayload(?User $user): ?array
+    {
+        if ($user === null) {
+            return null;
+        }
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'username' => $user->username,
+            'email' => $user->email,
+            'role' => $user->role->value,
+        ];
+    }
+
+    /**
+     * @return array{name: string, logo_url: string|null}
+     */
+    private function schoolPayload(): array
+    {
+        $profile = SchoolProfile::current();
+
+        return [
+            'name' => $profile->name ?? config('app.name'),
+            'logo_url' => $profile?->logo_path !== null
+                ? Storage::disk('public')->url($profile->logo_path)
+                : null,
+        ];
+    }
+
+    /**
+     * The role-aware sidebar navigation. Items flagged coming_soon form the
+     * final per-role information architecture; each flips to a live href as
+     * its page ships (STEPS.md steps 14-23).
+     *
+     * @return list<array{label: string|null, items: list<array{key: string, title: string, href: string|null, coming_soon: bool}>}>
+     */
+    private function navPayload(Role $role): array
+    {
+        $dashboard = [
+            'key' => 'dashboard',
+            'title' => 'Dashboard',
+            'href' => route('dashboard'),
+            'coming_soon' => false,
+        ];
+
+        $soon = fn (string $key, string $title): array => [
+            'key' => $key,
+            'title' => $title,
+            'href' => null,
+            'coming_soon' => true,
+        ];
+
+        return match ($role) {
+            Role::Admin => [
+                ['label' => null, 'items' => [$dashboard]],
+                ['label' => 'Akademik', 'items' => [
+                    $soon('master', 'Data Master'),
+                    $soon('accounts', 'Akun Pengguna'),
+                    $soon('schedule', 'Penempatan & Jadwal'),
+                ]],
+                ['label' => 'Rapor', 'items' => [
+                    $soon('report-publish', 'Terbitkan Rapor'),
+                    $soon('promotion', 'Kenaikan Kelas'),
+                ]],
+                ['label' => 'Sistem', 'items' => [
+                    $soon('school-settings', 'Pengaturan Sekolah'),
+                    $soon('audit-log', 'Log Audit'),
+                ]],
+            ],
+            Role::Teacher => [
+                ['label' => null, 'items' => [$dashboard]],
+                ['label' => 'Mengajar', 'items' => [
+                    $soon('attendance', 'Presensi'),
+                    $soon('grades', 'Nilai'),
+                    $soon('homeroom', 'Rapor Wali Kelas'),
+                ]],
+            ],
+            Role::Student => [
+                ['label' => null, 'items' => [$dashboard]],
+                ['label' => 'Belajar', 'items' => [
+                    $soon('schedule', 'Jadwal'),
+                    $soon('attendance', 'Presensi'),
+                    $soon('grades', 'Nilai'),
+                    $soon('report-card', 'Rapor'),
+                ]],
+            ],
+            Role::Parent => [
+                ['label' => null, 'items' => [$dashboard]],
+                ['label' => 'Anak', 'items' => [
+                    $soon('schedule', 'Jadwal'),
+                    $soon('attendance', 'Presensi'),
+                    $soon('grades', 'Nilai'),
+                    $soon('report-card', 'Rapor'),
+                ]],
+            ],
+        };
     }
 }

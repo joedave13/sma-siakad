@@ -1,5 +1,7 @@
 import type { Directive } from 'vue';
 import type { Auth } from '@/types/auth';
+import type { SidebarNavGroup } from '@/types/navigation';
+import type { SchoolBrand } from '@/types/ui';
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
@@ -19,6 +21,8 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            school: SchoolBrand;
+            nav: SidebarNavGroup[];
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

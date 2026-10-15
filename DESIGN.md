@@ -36,11 +36,11 @@ Exact families are chosen at build time and recorded with a one-line reason (R-0
 
 ## Dials
 
-| Dial | Value | Meaning for this product |
-|---|---|---|
-| ENERGY | 2 (Balanced) | Clear focal point per screen; the design says hello through hierarchy, not volume. |
+| Dial   | Value        | Meaning for this product                                                                               |
+| ------ | ------------ | ------------------------------------------------------------------------------------------------------ |
+| ENERGY | 2 (Balanced) | Clear focal point per screen; the design says hello through hierarchy, not volume.                     |
 | RHYTHM | 2 (Balanced) | Predictable structure with a few deliberate breaks (dashboards may vary; record screens stay uniform). |
-| MOTION | 1 (Calm) | Hover states and light transitions only; motion confirms actions, it never performs. |
+| MOTION | 1 (Calm)     | Hover states and light transitions only; motion confirms actions, it never performs.                   |
 
 Every screen holds these three values from first section to last.
 

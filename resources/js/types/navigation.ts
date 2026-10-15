@@ -12,3 +12,16 @@ export type NavItem = {
     icon?: LucideIcon;
     isActive?: boolean;
 };
+
+export type SidebarNavItem = {
+    key: string;
+    title: string;
+    href?: string | null;
+    coming_soon?: boolean;
+    icon?: LucideIcon;
+};
+
+export type SidebarNavGroup = {
+    label: string | null;
+    items: SidebarNavItem[];
+};
