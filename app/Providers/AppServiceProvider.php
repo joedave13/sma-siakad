@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Enums\Role;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +27,20 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureAuthorization();
+    }
+
+    /**
+     * Admins pass every ability check; per-role abilities still deny non-admins.
+     */
+    protected function configureAuthorization(): void
+    {
+        Gate::before(fn (User $user): ?bool => $user->role === Role::Admin ? true : null);
+
+        Gate::define(
+            'manageAcademicMaster',
+            fn (User $user): bool => $user->role === Role::Admin,
+        );
     }
 
     /**
