@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
  * @property SemesterTerm $name
  * @property Carbon|null $start_date
  * @property Carbon|null $end_date
+ * @property Carbon|null $grades_locked_at
+ * @property Carbon|null $report_published_at
  */
 #[Fillable(['academic_year_id', 'name', 'start_date', 'end_date', 'is_active', 'grades_locked_at', 'report_published_at'])]
 class Semester extends Model

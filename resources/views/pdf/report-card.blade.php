@@ -82,6 +82,9 @@
             </tr>
         </table>
         <div class="doc-title">LAPORAN HASIL BELAJAR</div>
+        @if (! empty($snapshot['revision']))
+            <div class="doc-title" style="font-size: 11px; margin: 0 0 4px;">{{ $snapshot['revision'] }}</div>
+        @endif
     </div>
 
     <table class="identity">

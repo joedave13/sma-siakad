@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\GenerationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'homeroom_note',
     'promotion_outcome',
     'pdf_path',
+    'generation_status',
+    'generation_error',
     'snapshot',
     'generated_at',
     'published_at',
@@ -33,6 +36,7 @@ class ReportCard extends Model
     {
         return [
             'snapshot' => 'array',
+            'generation_status' => GenerationStatus::class,
             'generated_at' => 'datetime',
             'published_at' => 'datetime',
         ];

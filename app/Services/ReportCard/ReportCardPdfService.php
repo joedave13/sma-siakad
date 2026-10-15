@@ -7,6 +7,7 @@ use App\Models\Semester;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ReportCardPdfService
 {
@@ -27,12 +28,23 @@ class ReportCardPdfService
             ->output();
 
         $path = sprintf('report-cards/%d-%d.pdf', $student->getKey(), $semester->getKey());
-        Storage::disk('public')->put($path, $pdf);
 
         $reportCard = ReportCard::query()->firstOrNew([
             'student_id' => $student->getKey(),
             'semester_id' => $semester->getKey(),
         ]);
+
+        if ($reportCard->isPublished()
+            && filled($reportCard->pdf_path)
+            && Storage::disk('public')->exists((string) $reportCard->pdf_path)
+        ) {
+            $previous = Str::replaceLast('.pdf', '-sebelumnya.pdf', (string) $reportCard->pdf_path);
+            Storage::disk('public')->copy((string) $reportCard->pdf_path, $previous);
+            $snapshot['revision'] = 'Direvisi';
+            $snapshot['previous_pdf_path'] = $previous;
+        }
+
+        Storage::disk('public')->put($path, $pdf);
 
         $reportCard->snapshot = $snapshot;
         $reportCard->pdf_path = $path;

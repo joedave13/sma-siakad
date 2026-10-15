@@ -3,6 +3,7 @@
 namespace App\Services\ReportCard;
 
 use App\Models\AcademicSetting;
+use App\Models\Classroom;
 use App\Models\DailyAttendance;
 use App\Models\GradeEntry;
 use App\Models\SchoolProfile;
@@ -25,14 +26,9 @@ class ReportCardSnapshotBuilder
      */
     public function build(Student $student, Semester $semester): array
     {
-        $profile = $this->usableProfile();
+        $profile = $this->assertUsableIdentity();
 
-        $enrollment = $student->enrollments()
-            ->where('academic_year_id', $semester->academic_year_id)
-            ->with('classroom')
-            ->first();
-
-        $classroom = $enrollment?->classroom;
+        $classroom = $this->classroomFor($student, $semester);
 
         $grades = $this->grades($student, $semester, $classroom?->id);
         $scored = array_filter($grades, fn (array $grade): bool => $grade['score'] !== null);
@@ -72,6 +68,44 @@ class ReportCardSnapshotBuilder
             'promotion_outcome' => null,
             'generated_at' => now('Asia/Jakarta')->toISOString(),
         ];
+    }
+
+    /**
+     * The "Subject: Component" labels still missing a score for this student this semester.
+     *
+     * @return array<int, string>
+     */
+    public function missingComponentsFor(Student $student, Semester $semester): array
+    {
+        $classroomId = $this->classroomFor($student, $semester)?->getKey();
+
+        if ($classroomId === null) {
+            return [];
+        }
+
+        $assignments = $semester->teachingAssignments()
+            ->where('classroom_id', $classroomId)
+            ->with('subject')
+            ->get();
+
+        $missing = [];
+        foreach ($assignments as $assignment) {
+            $entries = GradeEntry::query()
+                ->where('teaching_assignment_id', $assignment->getKey())
+                ->where('student_id', $student->getKey())
+                ->get()
+                ->map(fn (GradeEntry $entry): array => [
+                    'component' => $entry->component,
+                    'score' => $entry->score,
+                ])
+                ->all();
+
+            foreach ($this->calculator->missingComponents($entries) as $component) {
+                $missing[] = $assignment->subject->name.' ('.$component->label().')';
+            }
+        }
+
+        return $missing;
     }
 
     /**
@@ -172,10 +206,19 @@ class ReportCardSnapshotBuilder
         ];
     }
 
+    private function classroomFor(Student $student, Semester $semester): ?Classroom
+    {
+        return $student->enrollments()
+            ->where('academic_year_id', $semester->academic_year_id)
+            ->with('classroom')
+            ->first()
+            ?->classroom;
+    }
+
     /**
      * @throws ValidationException
      */
-    private function usableProfile(): SchoolProfile
+    public function assertUsableIdentity(): SchoolProfile
     {
         $profile = SchoolProfile::current();
 
