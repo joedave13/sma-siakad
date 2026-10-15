@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * @property array<string, mixed>|null $snapshot
+ */
+#[Fillable([
+    'student_id',
+    'semester_id',
+    'homeroom_note',
+    'promotion_outcome',
+    'pdf_path',
+    'snapshot',
+    'generated_at',
+    'published_at',
+])]
+class ReportCard extends Model
+{
+    use SoftDeletes;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'snapshot' => 'array',
+            'generated_at' => 'datetime',
+            'published_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * @return BelongsTo<Student, $this>
+     */
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    /**
+     * @return BelongsTo<Semester, $this>
+     */
+    public function semester(): BelongsTo
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->published_at !== null;
+    }
+}

@@ -55,4 +55,12 @@ class TeachingAssignment extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    /**
+     * @return HasMany<GradeRemark, $this>
+     */
+    public function gradeRemarks(): HasMany
+    {
+        return $this->hasMany(GradeRemark::class);
+    }
 }
