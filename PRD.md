@@ -9,70 +9,77 @@
 
 **Goal.** One system of record for academic master data, per-lesson attendance, grade input, report cards and year-end promotion, with read access for students and parents.
 
-| Metric | Baseline (assumed) | v1 Target |
-|---|---|---|
-| Time to produce report cards for one class (~28 students) | ~1 day | < 15 min after grades locked |
-| Lesson periods with digital attendance | 0% | ≥ 95% in first full semester |
-| Teacher time to submit attendance for one period | ~5 min | < 60 sec |
-| Grade rows corrected after report card publish | unknown | < 2% |
-| Parents who viewed a published report card | 0% | ≥ 70% by end of semester 1 |
+| Metric                                                    | Baseline (assumed) | v1 Target                    |
+| --------------------------------------------------------- | ------------------ | ---------------------------- |
+| Time to produce report cards for one class (~28 students) | ~1 day             | < 15 min after grades locked |
+| Lesson periods with digital attendance                    | 0%                 | ≥ 95% in first full semester |
+| Teacher time to submit attendance for one period          | ~5 min             | < 60 sec                     |
+| Grade rows corrected after report card publish            | unknown            | < 2%                         |
+| Parents who viewed a published report card                | 0%                 | ≥ 70% by end of semester 1   |
 
 **Scale and load.** ~500 students, ~50 teachers, 18 classes (3 IPA + 3 IPS per grade level, ~28 students each; grade 10 has no track). Peak: Monday 07:00, up to ~50 teachers submit attendance within a few minutes. Target: attendance submit p95 < 1 s at 50 concurrent teachers on one VPS (2 vCPU / 4 GB), MySQL 8.0+ (InnoDB buffer pool ~1 GB), queue worker for PDFs and notifications, nightly DB backup.
 
 ## 2. User Stories & Acceptance Criteria
 
 **Admin Staff**
+
 - **A1.** Manage academic years, semesters, lesson periods, classes, subjects.
-  - AC: Only one academic year/semester is `active`. Deleting a record with dependent grades/attendance is blocked with an explanation.
+    - AC: Only one academic year/semester is `active`. Deleting a record with dependent grades/attendance is blocked with an explanation.
 - **A2.** Create all accounts (students, teachers, parents) manually or via CSV/XLSX import, and link parents to students.
-  - AC: Import validates every row with a per-row error report; duplicate NISN/NIP/username rejected. Usernames: NISN (students), NIP/NUPTK (teachers), phone number in `628xxxx` format (parents). Generated initial password shown once, must be changed on first login. No self-registration.
+    - AC: Import validates every row with a per-row error report; duplicate NISN/NIP/username rejected. Usernames: NISN (students), NIP/NUPTK (teachers), phone number in `628xxxx` format (parents). Generated initial password shown once, must be changed on first login. No self-registration.
 - **A3.** Assign students to classes, teachers to subject-class pairs, and build the weekly schedule per lesson period.
-  - AC: One class per student per academic year. One teacher per subject-class per semester. A teacher cannot be scheduled in two classes in the same period.
+    - AC: One class per student per academic year. One teacher per subject-class per semester. A teacher cannot be scheduled in two classes in the same period.
 - **A4.** Lock grades and publish report cards.
-  - AC: Lock blocks all teacher grade edits. Unlock requires a reason and is audit-logged. Publish is blocked if school identity is incomplete (A6).
+    - AC: Lock blocks all teacher grade edits. Unlock requires a reason and is audit-logged. Publish is blocked if school identity is incomplete (A6).
 - **A5.** Run year-end promotion.
-  - AC: Preview shows promote/retain/graduate per student; nothing changes until admin confirms; any row can be overridden before applying.
+    - AC: Preview shows promote/retain/graduate per student; nothing changes until admin confirms; any row can be overridden before applying.
 - **A6 (new). Manage school identity.** Page "Pengaturan Sekolah" (admin only).
-  - Fields: school name*, NPSN, address*, city* (used in report card date line), postal code, phone, email, headmaster name*, headmaster NIP*, logo* (PNG/JPG, ≤ 2 MB, min 200×200 px, auto-resized to max 400 px), optional headmaster signature image (transparent PNG, ≤ 1 MB). (*required)
-  - AC: Save validates required fields and file type/size, with inline Indonesian error messages. Page shows a live preview of the report card header and signature block. Changes are audit-logged. Changing identity never alters already-published report cards (each report card stores an identity snapshot). Logo replacement deletes the old file.
+    - Fields: school name*, NPSN, address*, city* (used in report card date line), postal code, phone, email, headmaster name*, headmaster NIP*, logo* (PNG/JPG, ≤ 2 MB, min 200×200 px, auto-resized to max 400 px), optional headmaster signature image (transparent PNG, ≤ 1 MB). (*required)
+    - AC: Save validates required fields and file type/size, with inline Indonesian error messages. Page shows a live preview of the report card header and signature block. Changes are audit-logged. Changing identity never alters already-published report cards (each report card stores an identity snapshot). Logo replacement deletes the old file.
 
 **Teacher**
+
 - **T1.** Take attendance per lesson period for my scheduled class.
-  - AC: List defaults all students to Present. Statuses: Present, Sick (Sakit), Permitted (Izin), Absent (Alpa), Late (Terlambat). One session per schedule slot per date, saved in one action. Editable by the submitting teacher until 23:59 the next day; later edits by admin only.
+    - AC: List defaults all students to Present. Statuses: Present, Sick (Sakit), Permitted (Izin), Absent (Alpa), Late (Terlambat). One session per schedule slot per date, saved in one action. Editable by the submitting teacher until 23:59 the next day; later edits by admin only.
 - **T2.** Enter scores per student per subject.
-  - AC: Components: Assignments 30%, Quiz 20%, Midterm 20%, Final 30%. Assignments and quizzes may have multiple entries, averaged per component. Scores 0–100, max 2 decimals. Blank ≠ 0. Final score = weighted sum, computed server-side, rounded to integer.
+    - AC: Components: Assignments 30%, Quiz 20%, Midterm 20%, Final 30%. Assignments and quizzes may have multiple entries, averaged per component. Scores 0–100, max 2 decimals. Blank ≠ 0. Final score = weighted sum, computed server-side, rounded to integer.
 - **T3.** Homeroom teacher: preview class report cards, write homeroom note, see missing grades.
-  - AC: Cannot mark class "ready" while any student has a missing component.
+    - AC: Cannot mark class "ready" while any student has a missing component.
 
 **Student**
+
 - **S1.** View schedule, my attendance, my grades and published report cards (read-only).
-  - AC: Only my own data; PDF downloadable after publish only.
+    - AC: Only my own data; PDF downloadable after publish only.
 
 **Parent**
+
 - **P1.** View each linked child's attendance, grades and report cards; switch between children.
-  - AC: Unlinked student returns 403.
+    - AC: Unlinked student returns 403.
 - **P2.** Receive an in-app notification when my child is marked Absent (Alpa).
-  - AC: Appears within 5 minutes of submit. No email/WhatsApp in v1.
+    - AC: Appears within 5 minutes of submit. No email/WhatsApp in v1.
 
 ## 3. Scope
 
 **Ships in v1**
+
 - Role-based auth (Policies + Spatie Permission), forced first-login password change, admin-only password reset.
 - Master data CRUD + CSV/XLSX import (no legacy migration). School identity settings (A6).
 - Class enrollment, teaching assignments, lesson periods, weekly schedule.
 - Per-lesson-period attendance with a derived **daily status** for reporting (rule below); student/parent read views; in-app absence notifications.
 - Grade entry with fixed 30/20/20/30 weights, per-subject KKM (default 75), lock/unlock.
 - Report card PDF (layout below), bulk generation per class, publish.
-- **Promotion** (automatic proposal + manual override): at even-semester publish, a student is *retained* if final score < KKM in **more than 3 subjects** (N = 3, configurable), else *promoted*. Grade 10 → 11, 11 → 12, grade 12 → `graduated`. Default placement keeps cohorts together (X-1 → XI-1); grade 11 track (IPA/IPS) is chosen by admin per student. Admin confirms before apply.
+- **Promotion** (automatic proposal + manual override): at even-semester publish, a student is _retained_ if final score < KKM in **more than 3 subjects** (N = 3, configurable), else _promoted_. Grade 10 → 11, 11 → 12, grade 12 → `graduated`. Default placement keeps cohorts together (X-1 → XI-1); grade 11 track (IPA/IPS) is chosen by admin per student. Admin confirms before apply.
 - Audit log (grades, attendance, promotion, unlock, settings). Role dashboards.
 
 **Does not ship in v1**
+
 - Native mobile app, QR/face/geo attendance; email/WhatsApp/SMS; knowledge/skills split grades, attitude grades, P5, extracurricular, counseling.
 - Fees, library, LMS, online exams; Dapodik/e-Rapor sync; multi-school; English UI; legacy data import; data-retention/privacy tooling.
 
 **Daily attendance rule (derived from period data, used on report card).** A school day = a date with ≥ 1 submitted session for the student's class. The student's day status is taken from the **first recorded period of that day** (the earliest lesson period with a submitted session): Sakit, Izin or Alpa → that status; Late → Hadir with a **Terlambat** flag; Present → Hadir. Later periods never change the daily status (they stay visible in per-period history). Admin can override a day; overrides are audit-logged.
 
 ### Report Card Layout (A4 portrait, one page per student)
+
 1. **Header:** logo (left), school name, address, phone/email (from A6), "LAPORAN HASIL BELAJAR" centered bold, thin rule.
 2. **Identity block:** Nama, NISN, Kelas | Semester, Tahun Ajaran, Wali Kelas.
 3. **Grades table:** No | Mata Pelajaran | Nilai Akhir | Predikat | Keterangan. Predikat: A ≥ 90, B 80–89, C 75–79 (KKM to 79), D < KKM. Keterangan = optional one-line teacher remark. Footer rows: Jumlah, Rata-rata.
@@ -105,6 +112,7 @@
 Indexes: attendances(student_id), daily_attendances(student_id, date), grade_entries(student_id, teaching_assignment_id), class_enrollments(classroom_id).
 
 **MySQL 8 specifics**
+
 - **Engine/charset:** InnoDB, `utf8mb4` / `utf8mb4_unicode_ci`. `.env`: `DB_CONNECTION=mysql`; Laravel `app.timezone=Asia/Jakarta` and MySQL connection `timezone='+07:00'`.
 - **Types:** `BIGINT UNSIGNED` PKs/FKs; scores `DECIMAL(5,2)`; attendance `date` columns use `DATE` (no timezone ambiguity); `snapshot` and audit `old_values`/`new_values` use native `JSON`.
 - **Enums:** every "enum" above is a `VARCHAR(20)` column cast to a PHP backed enum in Eloquent (not MySQL `ENUM`), so adding a value needs no `ALTER TABLE`.
