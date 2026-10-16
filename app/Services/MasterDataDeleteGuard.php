@@ -29,8 +29,10 @@ class MasterDataDeleteGuard
     /**
      * Block a soft delete while dependent records still reference the model,
      * listing every blocker with an Indonesian explanation. Covers master
-     * data plus account profiles (students, teachers, guardians); a blocked
-     * guardian must be unlinked from its children first.
+     * data, account profiles (students, teachers, guardians), and the
+     * teaching plan (assignments, schedule slots); a blocked guardian must
+     * be unlinked from its children first, and slots or assignments must be
+     * cleared down to no attendance history before they can be removed.
      *
      * @throws ValidationException
      */
@@ -123,6 +125,25 @@ class MasterDataDeleteGuard
             ],
             $model instanceof Guardian => [
                 'anak yang tertaut' => $model->students()->count(),
+            ],
+            $model instanceof TeachingAssignment => [
+                'jadwal' => $model->schedules()->count(),
+                'nilai' => GradeEntry::query()
+                    ->where('teaching_assignment_id', $model->getKey())
+                    ->count(),
+                'catatan nilai' => GradeRemark::query()
+                    ->where('teaching_assignment_id', $model->getKey())
+                    ->count(),
+                'sesi presensi' => AttendanceSession::query()
+                    ->whereHas('schedule', fn ($query) => $query
+                        ->withTrashed()
+                        ->where('teaching_assignment_id', $model->getKey()))
+                    ->count(),
+            ],
+            $model instanceof Schedule => [
+                'sesi presensi' => AttendanceSession::query()
+                    ->where('schedule_id', $model->getKey())
+                    ->count(),
             ],
             default => [],
         });

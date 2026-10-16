@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property DayOfWeek $day_of_week
+ */
 #[Fillable(['teaching_assignment_id', 'day_of_week', 'lesson_period_id'])]
 class Schedule extends Model
 {

@@ -59,6 +59,52 @@ class ScheduleCollisionService
     }
 
     /**
+     * The same assignment booked twice on one slot.
+     * Returns an Indonesian error message, or null when the slot is free.
+     */
+    public function duplicateScheduleMessage(
+        TeachingAssignment $assignment,
+        DayOfWeek $day,
+        LessonPeriod $period,
+        ?Schedule $ignore = null,
+    ): ?string {
+        $exists = Schedule::query()
+            ->where('teaching_assignment_id', $assignment->getKey())
+            ->where('day_of_week', $day->value)
+            ->where('lesson_period_id', $period->getKey())
+            ->when($ignore !== null, fn ($query) => $query->whereKeyNot($ignore->getKey()))
+            ->exists();
+
+        return $exists
+            ? 'Mata pelajaran ini sudah dijadwalkan pada hari dan jam pelajaran yang sama.'
+            : null;
+    }
+
+    /**
+     * A class can only hold one lesson per period, so a second subject in
+     * the same slot is rejected even when the teachers differ.
+     * Returns an Indonesian error message, or null when the slot is free.
+     */
+    public function classroomConflictMessage(
+        Classroom $classroom,
+        DayOfWeek $day,
+        LessonPeriod $period,
+        ?Schedule $ignore = null,
+    ): ?string {
+        $exists = Schedule::query()
+            ->where('day_of_week', $day->value)
+            ->where('lesson_period_id', $period->getKey())
+            ->when($ignore !== null, fn ($query) => $query->whereKeyNot($ignore->getKey()))
+            ->whereHas('teachingAssignment', fn ($query) => $query
+                ->where('classroom_id', $classroom->getKey()))
+            ->exists();
+
+        return $exists
+            ? 'Kelas tersebut sudah memiliki jadwal lain pada hari dan jam pelajaran yang sama.'
+            : null;
+    }
+
+    /**
      * A3 AC: a teacher cannot be scheduled in two classes in the same period.
      * Returns an Indonesian error message, or null when the slot is free.
      */

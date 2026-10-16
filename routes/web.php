@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\Master\LessonPeriodController;
 use App\Http\Controllers\Admin\Master\SemesterController;
 use App\Http\Controllers\Admin\Master\SubjectController;
 use App\Http\Controllers\Admin\ResetUserPasswordController;
+use App\Http\Controllers\Admin\Schedule\EnrollmentController;
+use App\Http\Controllers\Admin\Schedule\ScheduleController;
+use App\Http\Controllers\Admin\Schedule\TeachingAssignmentController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +73,22 @@ Route::middleware(['auth'])->group(function () {
 
         Route::resource('classrooms', ClassroomController::class)
             ->except(['show']);
+    });
+
+    Route::middleware('role:admin')->prefix('admin/schedule')->name('admin.schedule.')->group(function () {
+        Route::get('enrollments', [EnrollmentController::class, 'index'])->name('enrollments.index');
+        Route::post('enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+        Route::delete('enrollments/{classEnrollment}', [EnrollmentController::class, 'destroy'])
+            ->name('enrollments.destroy');
+
+        Route::get('assignments', [TeachingAssignmentController::class, 'index'])->name('assignments.index');
+        Route::post('assignments', [TeachingAssignmentController::class, 'store'])->name('assignments.store');
+        Route::delete('assignments/{teachingAssignment}', [TeachingAssignmentController::class, 'destroy'])
+            ->name('assignments.destroy');
+
+        Route::get('weekly', [ScheduleController::class, 'index'])->name('weekly.index');
+        Route::post('weekly', [ScheduleController::class, 'store'])->name('weekly.store');
+        Route::delete('weekly/{schedule}', [ScheduleController::class, 'destroy'])->name('weekly.destroy');
     });
 });
 

@@ -118,6 +118,13 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $schedule = [
+            'key' => 'schedule',
+            'title' => 'Penempatan & Jadwal',
+            'href' => route('admin.schedule.enrollments.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -131,7 +138,7 @@ class HandleInertiaRequests extends Middleware
                 ['label' => 'Akademik', 'items' => [
                     $master,
                     $accounts,
-                    $soon('schedule', 'Penempatan & Jadwal'),
+                    $schedule,
                 ]],
                 ['label' => 'Rapor', 'items' => [
                     $soon('report-publish', 'Terbitkan Rapor'),

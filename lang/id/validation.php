@@ -85,5 +85,12 @@ return [
         'type' => 'jenis akun',
         'student_id' => 'siswa',
         'relationship' => 'hubungan',
+        'classroom_id' => 'ruang kelas',
+        'semester_id' => 'semester',
+        'subject_id' => 'mata pelajaran',
+        'teacher_id' => 'guru',
+        'teaching_assignment_id' => 'penugasan mengajar',
+        'lesson_period_id' => 'jam pelajaran',
+        'day_of_week' => 'hari',
     ],
 ];

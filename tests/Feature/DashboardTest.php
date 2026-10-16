@@ -60,6 +60,9 @@ test('admin navigation groups management destinations by area', function () {
             ->where('nav.1.items.1.key', 'accounts')
             ->where('nav.1.items.1.href', route('admin.users.students.index'))
             ->where('nav.1.items.1.coming_soon', false)
+            ->where('nav.1.items.2.key', 'schedule')
+            ->where('nav.1.items.2.href', route('admin.schedule.enrollments.index'))
+            ->where('nav.1.items.2.coming_soon', false)
             ->where('nav.3.label', 'Sistem')
             ->has('nav.3.items', 2)
         );
