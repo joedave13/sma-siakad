@@ -60,7 +60,7 @@ defineProps<Props>();
                     <InputError class="mt-2" :message="errors.name" />
                 </div>
 
-                <div class="grid gap-6 sm:grid-cols-2">
+                <div class="grid items-start gap-6 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="start_date">Tanggal mulai</Label>
                         <Input

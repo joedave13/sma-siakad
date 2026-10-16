@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import type { InertiaLinkProps } from '@inertiajs/vue3';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import type { MasterTab } from '@/pages/admin/master/tabs';
 
-defineProps<{ tabs: MasterTab[] }>();
+type SectionTab = {
+    title: string;
+    href: NonNullable<InertiaLinkProps['href']>;
+};
+
+defineProps<{ tabs: SectionTab[]; label: string }>();
 
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
     <nav
-        aria-label="Data master"
+        :aria-label="label"
         class="mb-6 flex flex-wrap gap-1 border-b border-border pb-px"
     >
         <Link

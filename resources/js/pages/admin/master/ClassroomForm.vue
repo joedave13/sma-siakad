@@ -84,7 +84,7 @@ const majors = [
                     />
                 </div>
 
-                <div class="grid gap-6 sm:grid-cols-2">
+                <div class="grid items-start gap-6 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="name">Nama</Label>
                         <Input
@@ -123,7 +123,7 @@ const majors = [
                     </div>
                 </div>
 
-                <div class="grid gap-6 sm:grid-cols-2">
+                <div class="grid items-start gap-6 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="major">Jurusan</Label>
                         <select

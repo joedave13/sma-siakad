@@ -3,15 +3,22 @@
 namespace App\Services;
 
 use App\Models\AcademicYear;
+use App\Models\Attendance;
 use App\Models\AttendanceSession;
 use App\Models\ClassEnrollment;
 use App\Models\Classroom;
+use App\Models\DailyAttendance;
 use App\Models\GradeEntry;
+use App\Models\GradeRemark;
+use App\Models\Guardian;
 use App\Models\LessonPeriod;
+use App\Models\PromotionDecision;
 use App\Models\ReportCard;
 use App\Models\Schedule;
 use App\Models\Semester;
+use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\TeachingAssignment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -21,7 +28,9 @@ class MasterDataDeleteGuard
 {
     /**
      * Block a soft delete while dependent records still reference the model,
-     * listing every blocker with an Indonesian explanation.
+     * listing every blocker with an Indonesian explanation. Covers master
+     * data plus account profiles (students, teachers, guardians); a blocked
+     * guardian must be unlinked from its children first.
      *
      * @throws ValidationException
      */
@@ -97,6 +106,23 @@ class MasterDataDeleteGuard
                         ->withTrashed()
                         ->where('classroom_id', $model->getKey()))
                     ->count(),
+            ],
+            $model instanceof Student => [
+                'peserta didik terdaftar' => $model->enrollments()->count(),
+                'riwayat presensi' => Attendance::query()->where('student_id', $model->getKey())->count()
+                    + DailyAttendance::query()->where('student_id', $model->getKey())->count(),
+                'catatan nilai' => GradeEntry::query()->where('student_id', $model->getKey())->count()
+                    + GradeRemark::query()->where('student_id', $model->getKey())->count(),
+                'rapor' => ReportCard::query()->where('student_id', $model->getKey())->count(),
+                'keputusan kenaikan kelas' => PromotionDecision::query()->where('student_id', $model->getKey())->count(),
+                'tautan orang tua' => $model->guardians()->count(),
+            ],
+            $model instanceof Teacher => [
+                'penugasan mengajar' => $model->teachingAssignments()->count(),
+                'ruang kelas sebagai wali kelas' => $model->homeroomClassrooms()->count(),
+            ],
+            $model instanceof Guardian => [
+                'anak yang tertaut' => $model->students()->count(),
             ],
             default => [],
         });

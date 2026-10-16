@@ -111,6 +111,13 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $accounts = [
+            'key' => 'accounts',
+            'title' => 'Akun Pengguna',
+            'href' => route('admin.users.students.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -123,7 +130,7 @@ class HandleInertiaRequests extends Middleware
                 ['label' => null, 'items' => [$dashboard]],
                 ['label' => 'Akademik', 'items' => [
                     $master,
-                    $soon('accounts', 'Akun Pengguna'),
+                    $accounts,
                     $soon('schedule', 'Penempatan & Jadwal'),
                 ]],
                 ['label' => 'Rapor', 'items' => [

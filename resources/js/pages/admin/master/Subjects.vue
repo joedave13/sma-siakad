@@ -5,7 +5,7 @@ import { Plus } from '@lucide/vue';
 import SubjectController from '@/actions/App/Http/Controllers/Admin/Master/SubjectController';
 import AlertError from '@/components/AlertError.vue';
 import DataTable from '@/components/DataTable.vue';
-import MasterSectionNav from '@/components/MasterSectionNav.vue';
+import SectionTabs from '@/components/SectionTabs.vue';
 import PageHeader from '@/components/PageHeader.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,7 +77,7 @@ const columns = [
             </template>
         </PageHeader>
 
-        <MasterSectionNav :tabs="masterTabs" />
+        <SectionTabs :tabs="masterTabs" label="Data master" />
 
         <AlertError
             v-if="serverErrors.length > 0"

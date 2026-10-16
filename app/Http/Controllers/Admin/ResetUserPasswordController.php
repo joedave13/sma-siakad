@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AuditLogger;
+use App\Services\GeneratedPassword;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ResetUserPasswordController extends Controller
@@ -16,10 +17,16 @@ class ResetUserPasswordController extends Controller
      */
     public function store(Request $request, User $user): RedirectResponse
     {
-        $password = Str::lower(Str::random(8)).random_int(1000, 9999);
+        $password = GeneratedPassword::make();
 
         $user->update([
             'password' => $password,
+            'must_change_password' => true,
+        ]);
+
+        AuditLogger::record('account.password-reset', $user, [
+            'must_change_password' => false,
+        ], [
             'must_change_password' => true,
         ]);
 
