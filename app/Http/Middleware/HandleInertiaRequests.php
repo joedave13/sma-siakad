@@ -104,6 +104,13 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $master = [
+            'key' => 'master',
+            'title' => 'Data Master',
+            'href' => route('admin.master.academic-years.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -115,7 +122,7 @@ class HandleInertiaRequests extends Middleware
             Role::Admin => [
                 ['label' => null, 'items' => [$dashboard]],
                 ['label' => 'Akademik', 'items' => [
-                    $soon('master', 'Data Master'),
+                    $master,
                     $soon('accounts', 'Akun Pengguna'),
                     $soon('schedule', 'Penempatan & Jadwal'),
                 ]],

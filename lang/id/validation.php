@@ -54,5 +54,18 @@ return [
         ],
     ],
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'nama',
+        'code' => 'kode',
+        'kkm' => 'kkm',
+        'number' => 'nomor',
+        'start_date' => 'tanggal mulai',
+        'end_date' => 'tanggal selesai',
+        'start_time' => 'jam mulai',
+        'end_time' => 'jam selesai',
+        'grade_level' => 'tingkat kelas',
+        'major' => 'jurusan',
+        'academic_year_id' => 'tahun ajaran',
+        'homeroom_teacher_id' => 'wali kelas',
+    ],
 ];

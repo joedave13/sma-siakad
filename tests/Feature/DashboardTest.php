@@ -55,8 +55,8 @@ test('admin navigation groups management destinations by area', function () {
             ->where('nav.1.label', 'Akademik')
             ->has('nav.1.items', 3)
             ->where('nav.1.items.0.key', 'master')
-            ->where('nav.1.items.0.href', null)
-            ->where('nav.1.items.0.coming_soon', true)
+            ->where('nav.1.items.0.href', route('admin.master.academic-years.index'))
+            ->where('nav.1.items.0.coming_soon', false)
             ->where('nav.3.label', 'Sistem')
             ->has('nav.3.items', 2)
         );
