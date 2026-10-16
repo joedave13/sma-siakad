@@ -125,6 +125,20 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $schoolSettings = [
+            'key' => 'school-settings',
+            'title' => 'Pengaturan Sekolah',
+            'href' => route('admin.school-settings.edit'),
+            'coming_soon' => false,
+        ];
+
+        $auditLog = [
+            'key' => 'audit-log',
+            'title' => 'Log Audit',
+            'href' => route('admin.audit.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -145,8 +159,8 @@ class HandleInertiaRequests extends Middleware
                     $soon('promotion', 'Kenaikan Kelas'),
                 ]],
                 ['label' => 'Sistem', 'items' => [
-                    $soon('school-settings', 'Pengaturan Sekolah'),
-                    $soon('audit-log', 'Log Audit'),
+                    $schoolSettings,
+                    $auditLog,
                 ]],
             ],
             Role::Teacher => [

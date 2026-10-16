@@ -65,6 +65,12 @@ test('admin navigation groups management destinations by area', function () {
             ->where('nav.1.items.2.coming_soon', false)
             ->where('nav.3.label', 'Sistem')
             ->has('nav.3.items', 2)
+            ->where('nav.3.items.0.key', 'school-settings')
+            ->where('nav.3.items.0.href', route('admin.school-settings.edit'))
+            ->where('nav.3.items.0.coming_soon', false)
+            ->where('nav.3.items.1.key', 'audit-log')
+            ->where('nav.3.items.1.href', route('admin.audit.index'))
+            ->where('nav.3.items.1.coming_soon', false)
         );
 });
 

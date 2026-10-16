@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property array<string, mixed>|null $old_values
+ * @property array<string, mixed>|null $new_values
+ */
 #[Fillable([
     'user_id',
     'auditable_type',

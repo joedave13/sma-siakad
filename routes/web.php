@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Accounts\GuardianAccountController;
 use App\Http\Controllers\Admin\Accounts\GuardianLinkController;
 use App\Http\Controllers\Admin\Accounts\StudentAccountController;
 use App\Http\Controllers\Admin\Accounts\TeacherAccountController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\Master\AcademicYearController;
 use App\Http\Controllers\Admin\Master\ClassroomController;
 use App\Http\Controllers\Admin\Master\LessonPeriodController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Admin\ResetUserPasswordController;
 use App\Http\Controllers\Admin\Schedule\EnrollmentController;
 use App\Http\Controllers\Admin\Schedule\ScheduleController;
 use App\Http\Controllers\Admin\Schedule\TeachingAssignmentController;
+use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +91,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('weekly', [ScheduleController::class, 'index'])->name('weekly.index');
         Route::post('weekly', [ScheduleController::class, 'store'])->name('weekly.store');
         Route::delete('weekly/{schedule}', [ScheduleController::class, 'destroy'])->name('weekly.destroy');
+    });
+
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('school-settings', [SchoolProfileController::class, 'edit'])->name('school-settings.edit');
+        Route::put('school-settings', [SchoolProfileController::class, 'update'])->name('school-settings.update');
+
+        Route::get('audit', [AuditLogController::class, 'index'])->name('audit.index');
     });
 });
 

@@ -92,5 +92,13 @@ return [
         'teaching_assignment_id' => 'penugasan mengajar',
         'lesson_period_id' => 'jam pelajaran',
         'day_of_week' => 'hari',
+        'npsn' => 'npsn',
+        'city' => 'kota',
+        'postal_code' => 'kode pos',
+        'email' => 'email',
+        'headmaster_name' => 'nama kepala sekolah',
+        'headmaster_nip' => 'nip kepala sekolah',
+        'logo' => 'logo',
+        'headmaster_signature' => 'tanda tangan kepala sekolah',
     ],
 ];
