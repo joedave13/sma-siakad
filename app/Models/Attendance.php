@@ -6,6 +6,11 @@ use App\Enums\AttendanceStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $student_id
+ * @property AttendanceStatus $status
+ * @property bool $is_overridden
+ */
 class Attendance extends Model
 {
     /**

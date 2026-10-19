@@ -1,5 +1,15 @@
 <?php
 
+use App\Models\AcademicYear;
+use App\Models\ClassEnrollment;
+use App\Models\LessonPeriod;
+use App\Models\Schedule;
+use App\Models\Semester;
+use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\TeachingAssignment;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,4 +57,47 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Active-semester teacher, assignment, Monday schedule, and enrolled students
+ * for the teacher/admin attendance UI tests.
+ *
+ * @return array{teacher: Teacher, user: User, assignment: TeachingAssignment, schedule: Schedule, students: Collection<int, Student>}
+ */
+function teacherAttendanceUiContext(): array
+{
+    $teacher = Teacher::factory()->create();
+    $year = AcademicYear::factory()->active()->create();
+    $semester = Semester::factory()->active()->ganjil()->create(['academic_year_id' => $year->id]);
+    $assignment = TeachingAssignment::factory()->create([
+        'teacher_id' => $teacher->id,
+        'semester_id' => $semester->id,
+    ]);
+    $period = LessonPeriod::factory()->create([
+        'number' => 1,
+        'start_time' => '07:00',
+        'end_time' => '07:45',
+    ]);
+    $schedule = Schedule::factory()->create([
+        'teaching_assignment_id' => $assignment->id,
+        'lesson_period_id' => $period->id,
+        'day_of_week' => 'senin',
+    ]);
+    $students = Student::factory()->count(2)->create();
+    foreach ($students as $student) {
+        ClassEnrollment::factory()->create([
+            'student_id' => $student->id,
+            'classroom_id' => $assignment->classroom_id,
+            'academic_year_id' => $year->id,
+        ]);
+    }
+
+    return [
+        'teacher' => $teacher,
+        'user' => $teacher->user,
+        'assignment' => $assignment,
+        'schedule' => $schedule,
+        'students' => $students,
+    ];
 }

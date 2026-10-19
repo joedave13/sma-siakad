@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Accounts\GuardianAccountController;
 use App\Http\Controllers\Admin\Accounts\GuardianLinkController;
 use App\Http\Controllers\Admin\Accounts\StudentAccountController;
 use App\Http\Controllers\Admin\Accounts\TeacherAccountController;
+use App\Http\Controllers\Admin\Attendance\AdminAttendanceController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\Master\AcademicYearController;
 use App\Http\Controllers\Admin\Master\ClassroomController;
@@ -17,12 +18,14 @@ use App\Http\Controllers\Admin\Schedule\ScheduleController;
 use App\Http\Controllers\Admin\Schedule\TeachingAssignmentController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Teacher\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('force-password-change', [ForcePasswordChangeController::class, 'create'])
         ->name('force-password.change');
@@ -91,6 +94,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('weekly', [ScheduleController::class, 'index'])->name('weekly.index');
         Route::post('weekly', [ScheduleController::class, 'store'])->name('weekly.store');
         Route::delete('weekly/{schedule}', [ScheduleController::class, 'destroy'])->name('weekly.destroy');
+    });
+
+    Route::middleware('role:teacher')->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/{schedule}', [AttendanceController::class, 'show'])->name('attendance.show');
+        Route::post('attendance/{schedule}', [AttendanceController::class, 'store'])->name('attendance.store');
+    });
+
+    Route::middleware('role:admin')->prefix('admin/attendance')->name('admin.attendance.')->group(function () {
+        Route::get('{schedule}', [AdminAttendanceController::class, 'show'])->name('show');
+        Route::post('{schedule}', [AdminAttendanceController::class, 'store'])->name('store');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

@@ -126,7 +126,7 @@ class AttendanceSubmitService
         }
 
         if ($session === null) {
-            return $schedule->teachingAssignment->teacher_id === $user->getKey();
+            return $schedule->teachingAssignment->teacher_id === $user->teacher?->id;
         }
 
         return $session->submitted_by === $user->getKey()
@@ -138,7 +138,7 @@ class AttendanceSubmitService
      *
      * @return Collection<int, Student>
      */
-    private function roster(Schedule $schedule): Collection
+    public function roster(Schedule $schedule): Collection
     {
         $assignment = $schedule->teachingAssignment()->firstOrFail();
 

@@ -6,8 +6,13 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @property Carbon $date
+ * @property Carbon|null $submitted_at
+ */
 class AttendanceSession extends Model
 {
     /**

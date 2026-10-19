@@ -166,7 +166,12 @@ class HandleInertiaRequests extends Middleware
             Role::Teacher => [
                 ['label' => null, 'items' => [$dashboard]],
                 ['label' => 'Mengajar', 'items' => [
-                    $soon('attendance', 'Presensi'),
+                    [
+                        'key' => 'attendance',
+                        'title' => 'Presensi',
+                        'href' => route('teacher.attendance.index'),
+                        'coming_soon' => false,
+                    ],
                     $soon('grades', 'Nilai'),
                     $soon('homeroom', 'Rapor Wali Kelas'),
                 ]],
