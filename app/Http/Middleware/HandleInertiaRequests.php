@@ -172,8 +172,18 @@ class HandleInertiaRequests extends Middleware
                         'href' => route('teacher.attendance.index'),
                         'coming_soon' => false,
                     ],
-                    $soon('grades', 'Nilai'),
-                    $soon('homeroom', 'Rapor Wali Kelas'),
+                    [
+                        'key' => 'grades',
+                        'title' => 'Nilai',
+                        'href' => route('teacher.grades.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'homeroom',
+                        'title' => 'Rapor Wali Kelas',
+                        'href' => route('teacher.homeroom.index'),
+                        'coming_soon' => false,
+                    ],
                 ]],
             ],
             Role::Student => [

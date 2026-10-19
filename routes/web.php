@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teacher\AttendanceController;
+use App\Http\Controllers\Teacher\GradeController;
+use App\Http\Controllers\Teacher\HomeroomController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -100,6 +102,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
         Route::get('attendance/{schedule}', [AttendanceController::class, 'show'])->name('attendance.show');
         Route::post('attendance/{schedule}', [AttendanceController::class, 'store'])->name('attendance.store');
+
+        Route::get('grades', [GradeController::class, 'index'])->name('grades.index');
+        Route::get('grades/{teachingAssignment}', [GradeController::class, 'show'])->name('grades.show');
+        Route::post('grades/{teachingAssignment}', [GradeController::class, 'store'])->name('grades.store');
+
+        Route::get('homeroom', [HomeroomController::class, 'index'])->name('homeroom.index');
+        Route::get('homeroom/{classroom}', [HomeroomController::class, 'show'])->name('homeroom.show');
+        Route::post('homeroom/{classroom}/notes', [HomeroomController::class, 'storeNote'])->name('homeroom.notes.store');
+        Route::post('homeroom/{classroom}/ready', [HomeroomController::class, 'storeReady'])->name('homeroom.ready');
     });
 
     Route::middleware('role:admin')->prefix('admin/attendance')->name('admin.attendance.')->group(function () {

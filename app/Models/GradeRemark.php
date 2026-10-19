@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string|null $remark
+ */
 #[Fillable(['teaching_assignment_id', 'student_id', 'remark'])]
 class GradeRemark extends Model
 {

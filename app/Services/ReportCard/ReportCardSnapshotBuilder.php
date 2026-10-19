@@ -6,10 +6,13 @@ use App\Models\AcademicSetting;
 use App\Models\Classroom;
 use App\Models\DailyAttendance;
 use App\Models\GradeEntry;
+use App\Models\GradeRemark;
+use App\Models\ReportCard;
 use App\Models\SchoolProfile;
 use App\Models\Semester;
 use App\Models\Student;
 use App\Services\Grades\FinalScoreCalculator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -64,7 +67,10 @@ class ReportCardSnapshotBuilder
                 'average' => $scored === [] ? null : round(array_sum(array_column($scored, 'score')) / count($scored), 2),
             ],
             'attendance' => $this->attendance($student, $semester),
-            'homeroom_note' => null,
+            'homeroom_note' => ReportCard::query()
+                ->where('student_id', $student->getKey())
+                ->where('semester_id', $semester->getKey())
+                ->value('homeroom_note'),
             'promotion_outcome' => null,
             'generated_at' => now('Asia/Jakarta')->toISOString(),
         ];
@@ -106,6 +112,89 @@ class ReportCardSnapshotBuilder
         }
 
         return $missing;
+    }
+
+    /**
+     * Per-student preview for a whole classroom roster in one pass of
+     * queries: final scores per subject, missing component labels and the
+     * stored homeroom note, keyed by student id.
+     *
+     * @param  Collection<int, Student>  $students
+     * @return array<int, array{grades: list<array{subject: string, score: ?int, kkm: int, predicate: string, passed: bool, remark: ?string}>, missing: list<string>, homeroom_note: ?string}>
+     */
+    public function homeroomPreview(Classroom $classroom, Semester $semester, Collection $students): array
+    {
+        $assignments = $semester->teachingAssignments()
+            ->where('classroom_id', $classroom->getKey())
+            ->with('subject')
+            ->get();
+
+        $assignmentIds = $assignments->pluck('id');
+        $studentIds = $students->pluck('id');
+
+        $entriesByStudent = GradeEntry::query()
+            ->whereIn('teaching_assignment_id', $assignmentIds)
+            ->whereIn('student_id', $studentIds)
+            ->get()
+            ->groupBy('student_id');
+
+        $remarksByStudent = GradeRemark::query()
+            ->whereIn('teaching_assignment_id', $assignmentIds)
+            ->whereIn('student_id', $studentIds)
+            ->get()
+            ->groupBy('student_id');
+
+        $notes = ReportCard::query()
+            ->where('semester_id', $semester->getKey())
+            ->whereIn('student_id', $studentIds)
+            ->pluck('homeroom_note', 'student_id');
+
+        $preview = [];
+
+        foreach ($students as $student) {
+            $studentEntries = $entriesByStudent->get($student->getKey(), collect());
+            $studentRemarks = $remarksByStudent->get($student->getKey(), collect());
+
+            $grades = [];
+            $missing = [];
+
+            foreach ($assignments as $assignment) {
+                $entries = $studentEntries
+                    ->filter(fn (GradeEntry $entry) => $entry->teaching_assignment_id === $assignment->getKey())
+                    ->map(fn (GradeEntry $entry): array => [
+                        'component' => $entry->component,
+                        'score' => $entry->score,
+                    ])
+                    ->all();
+
+                $score = $this->calculator->finalScore($entries);
+                $kkm = $assignment->subject->kkm;
+                $remark = $studentRemarks
+                    ->first(fn (GradeRemark $row) => $row->teaching_assignment_id === $assignment->getKey())
+                    ?->remark;
+
+                $grades[] = [
+                    'subject' => $assignment->subject->name,
+                    'score' => $score,
+                    'kkm' => $kkm,
+                    'predicate' => $score === null ? '-' : $this->predicateFor($score, $kkm),
+                    'passed' => $score === null ? false : $score >= $kkm,
+                    'remark' => $remark,
+                ];
+
+                foreach ($this->calculator->missingComponents($entries) as $component) {
+                    $missing[] = $assignment->subject->name.' ('.$component->label().')';
+                }
+            }
+
+            $preview[$student->getKey()] = [
+                'grades' => $grades,
+                'missing' => $missing,
+                'homeroom_note' => $notes->get($student->getKey()),
+            ];
+        }
+
+        return $preview;
     }
 
     /**

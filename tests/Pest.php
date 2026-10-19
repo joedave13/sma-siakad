@@ -2,6 +2,7 @@
 
 use App\Models\AcademicYear;
 use App\Models\ClassEnrollment;
+use App\Models\Classroom;
 use App\Models\LessonPeriod;
 use App\Models\Schedule;
 use App\Models\Semester;
@@ -99,5 +100,31 @@ function teacherAttendanceUiContext(): array
         'assignment' => $assignment,
         'schedule' => $schedule,
         'students' => $students,
+    ];
+}
+
+/**
+ * Active-semester homeroom teacher, classroom, assignment, semester, and
+ * enrolled students for the teacher homeroom UI tests.
+ *
+ * @return array{teacher: Teacher, user: User, classroom: Classroom, assignment: TeachingAssignment, semester: Semester, students: Collection<int, Student>}
+ */
+function teacherHomeroomUiContext(): array
+{
+    $context = teacherAttendanceUiContext();
+    $semester = $context['assignment']->semester;
+    $classroom = $context['assignment']->classroom;
+    $classroom->update([
+        'academic_year_id' => $semester->academic_year_id,
+        'homeroom_teacher_id' => $context['teacher']->id,
+    ]);
+
+    return [
+        'teacher' => $context['teacher'],
+        'user' => $context['user'],
+        'classroom' => $classroom,
+        'assignment' => $context['assignment'],
+        'semester' => $semester,
+        'students' => $context['students'],
     ];
 }
