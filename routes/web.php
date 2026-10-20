@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Master\ClassroomController;
 use App\Http\Controllers\Admin\Master\LessonPeriodController;
 use App\Http\Controllers\Admin\Master\SemesterController;
 use App\Http\Controllers\Admin\Master\SubjectController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResetUserPasswordController;
 use App\Http\Controllers\Admin\Schedule\EnrollmentController;
 use App\Http\Controllers\Admin\Schedule\ScheduleController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\Schedule\TeachingAssignmentController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportCardDownloadController;
 use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\HomeroomController;
@@ -113,9 +115,27 @@ Route::middleware(['auth'])->group(function () {
         Route::post('homeroom/{classroom}/ready', [HomeroomController::class, 'storeReady'])->name('homeroom.ready');
     });
 
+    Route::middleware('role:student')->prefix('rapor')->name('student.report-cards.')->group(function () {
+        Route::get('{semester}/unduh', [ReportCardDownloadController::class, 'student'])->name('download');
+    });
+
+    Route::middleware('role:parent')->prefix('anak/{student}/rapor')->name('guardian.report-cards.')->group(function () {
+        Route::get('{semester}/unduh', [ReportCardDownloadController::class, 'guardian'])->name('download');
+    });
+
     Route::middleware('role:admin')->prefix('admin/attendance')->name('admin.attendance.')->group(function () {
         Route::get('{schedule}', [AdminAttendanceController::class, 'show'])->name('show');
         Route::post('{schedule}', [AdminAttendanceController::class, 'store'])->name('store');
+    });
+
+    Route::middleware('role:admin')->prefix('admin/reports')->name('admin.reports.')->group(function () {
+        Route::get('', [ReportController::class, 'index'])->name('index');
+        Route::get('{semester}', [ReportController::class, 'show'])->name('show');
+        Route::post('{semester}/lock', [ReportController::class, 'lock'])->name('lock');
+        Route::post('{semester}/unlock', [ReportController::class, 'unlock'])->name('unlock');
+        Route::post('{semester}/generate', [ReportController::class, 'generate'])->name('generate');
+        Route::post('{semester}/retry', [ReportController::class, 'retry'])->name('retry');
+        Route::post('{semester}/publish', [ReportController::class, 'publish'])->name('publish');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

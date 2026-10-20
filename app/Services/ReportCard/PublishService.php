@@ -200,6 +200,76 @@ class PublishService
     }
 
     /**
+     * Generation status overview for every active student in the year.
+     *
+     * Rows are sorted by name and carry a `revised` flag when the card was
+     * regenerated after it was published (PRD: "Direvisi" on regenerate).
+     *
+     * @return array{
+     *     summary: array{total: int, done: int, pending: int, failed: int, without_card: int},
+     *     rows: list<array{student_id: int, full_name: string, nisn: string, status: string, error: string|null, generated_at: string|null, revised: bool}>
+     * }
+     */
+    public function status(Semester $semester): array
+    {
+        $students = $this->students($semester)->sortBy('full_name')->values();
+
+        $cards = ReportCard::query()
+            ->where('semester_id', $semester->getKey())
+            ->whereIn('student_id', $students->pluck('id')->all())
+            ->get()
+            ->keyBy('student_id');
+
+        $summary = ['total' => $students->count(), 'done' => 0, 'pending' => 0, 'failed' => 0, 'without_card' => 0];
+        $rows = [];
+
+        foreach ($students as $student) {
+            $card = $cards->get($student->getKey());
+
+            if ($card === null) {
+                $summary['without_card']++;
+                $rows[] = [
+                    'student_id' => $student->getKey(),
+                    'full_name' => $student->full_name,
+                    'nisn' => $student->nisn,
+                    'status' => 'none',
+                    'error' => null,
+                    'generated_at' => null,
+                    'revised' => false,
+                ];
+
+                continue;
+            }
+
+            if ($card->generation_status === GenerationStatus::Done) {
+                $summary['done']++;
+            } elseif ($card->generation_status === GenerationStatus::Failed) {
+                $summary['failed']++;
+            } else {
+                $summary['pending']++;
+            }
+
+            $rows[] = [
+                'student_id' => $student->getKey(),
+                'full_name' => $student->full_name,
+                'nisn' => $student->nisn,
+                'status' => match (true) {
+                    $card->generation_status === GenerationStatus::Done => GenerationStatus::Done->value,
+                    $card->generation_status === GenerationStatus::Failed => GenerationStatus::Failed->value,
+                    default => GenerationStatus::Pending->value,
+                },
+                'error' => $card->generation_error,
+                'generated_at' => $card->generated_at?->format('d/m/Y H:i'),
+                'revised' => $card->published_at !== null
+                    && $card->generated_at !== null
+                    && $card->generated_at->greaterThan($card->published_at),
+            ];
+        }
+
+        return ['summary' => $summary, 'rows' => $rows];
+    }
+
+    /**
      * Active students enrolled in the semester's academic year.
      *
      * @return Collection<int, Student>

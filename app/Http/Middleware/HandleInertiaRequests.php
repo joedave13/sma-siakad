@@ -139,6 +139,13 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $reportPublish = [
+            'key' => 'report-publish',
+            'title' => 'Terbitkan Rapor',
+            'href' => route('admin.reports.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -155,7 +162,7 @@ class HandleInertiaRequests extends Middleware
                     $schedule,
                 ]],
                 ['label' => 'Rapor', 'items' => [
-                    $soon('report-publish', 'Terbitkan Rapor'),
+                    $reportPublish,
                     $soon('promotion', 'Kenaikan Kelas'),
                 ]],
                 ['label' => 'Sistem', 'items' => [

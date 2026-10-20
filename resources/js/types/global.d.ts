@@ -29,6 +29,7 @@ declare module '@inertiajs/core' {
         flashDataType: {
             toast?: { type: 'success' | 'error'; message: string };
             importErrors?: string[];
+            report_card?: string[];
         };
     }
 }

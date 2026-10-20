@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\GenerationStatus;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property array<string, mixed>|null $snapshot
+ * @property GenerationStatus|null $generation_status
+ * @property string|null $generation_error
+ * @property string|null $pdf_path
+ * @property CarbonImmutable|null $generated_at
+ * @property CarbonImmutable|null $published_at
  */
 #[Fillable([
     'student_id',
