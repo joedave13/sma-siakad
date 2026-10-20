@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Master\ClassroomController;
 use App\Http\Controllers\Admin\Master\LessonPeriodController;
 use App\Http\Controllers\Admin\Master\SemesterController;
 use App\Http\Controllers\Admin\Master\SubjectController;
+use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResetUserPasswordController;
 use App\Http\Controllers\Admin\Schedule\EnrollmentController;
@@ -136,6 +137,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('{semester}/generate', [ReportController::class, 'generate'])->name('generate');
         Route::post('{semester}/retry', [ReportController::class, 'retry'])->name('retry');
         Route::post('{semester}/publish', [ReportController::class, 'publish'])->name('publish');
+    });
+
+    Route::middleware('role:admin')->prefix('admin/promotion')->name('admin.promotion.')->group(function () {
+        Route::get('', [PromotionController::class, 'index'])->name('index');
+        Route::post('propose', [PromotionController::class, 'propose'])->name('propose');
+        Route::post('decisions/{promotionDecision}/override', [PromotionController::class, 'override'])->name('override');
+        Route::post('apply', [PromotionController::class, 'apply'])->name('apply');
     });
 
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

@@ -30,6 +30,7 @@ declare module '@inertiajs/core' {
             toast?: { type: 'success' | 'error'; message: string };
             importErrors?: string[];
             report_card?: string[];
+            promotion?: string[];
         };
     }
 }

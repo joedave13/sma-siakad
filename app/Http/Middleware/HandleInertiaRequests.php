@@ -146,6 +146,13 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
+        $promotion = [
+            'key' => 'promotion',
+            'title' => 'Kenaikan Kelas',
+            'href' => route('admin.promotion.index'),
+            'coming_soon' => false,
+        ];
+
         $soon = fn (string $key, string $title): array => [
             'key' => $key,
             'title' => $title,
@@ -163,7 +170,7 @@ class HandleInertiaRequests extends Middleware
                 ]],
                 ['label' => 'Rapor', 'items' => [
                     $reportPublish,
-                    $soon('promotion', 'Kenaikan Kelas'),
+                    $promotion,
                 ]],
                 ['label' => 'Sistem', 'items' => [
                     $schoolSettings,
