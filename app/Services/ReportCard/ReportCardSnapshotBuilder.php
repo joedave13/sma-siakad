@@ -66,7 +66,7 @@ class ReportCardSnapshotBuilder
                 'total' => array_sum(array_column($scored, 'score')),
                 'average' => $scored === [] ? null : round(array_sum(array_column($scored, 'score')) / count($scored), 2),
             ],
-            'attendance' => $this->attendance($student, $semester),
+            'attendance' => $this->attendanceSummary($student, $semester),
             'homeroom_note' => ReportCard::query()
                 ->where('student_id', $student->getKey())
                 ->where('semester_id', $semester->getKey())
@@ -266,11 +266,12 @@ class ReportCardSnapshotBuilder
     }
 
     /**
-     * Daily attendance counts over the semester's date range.
+     * Daily attendance counts over the semester's date range. Public so the
+     * student/parent read views report the exact numbers the report card does.
      *
      * @return array{sick: int, permitted: int, absent: int, late: int, school_days: int, present_days: int, percentage: int}
      */
-    private function attendance(Student $student, Semester $semester): array
+    public function attendanceSummary(Student $student, Semester $semester): array
     {
         $days = DailyAttendance::query()
             ->where('student_id', $student->getKey())

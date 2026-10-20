@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'school' => $this->schoolPayload(),
             'nav' => $user === null ? [] : $this->navPayload($user->role),
+            'notifications' => $this->notificationsPayload($user),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
@@ -74,6 +75,28 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
+     * Unread-count payload for the header bell. Only parents receive
+     * notifications in v1 (PRD P2), so other roles share null and the
+     * bell stays hidden.
+     *
+     * @return array{unread_count: int}|null
+     */
+    private function notificationsPayload(?User $user): ?array
+    {
+        if ($user === null || $user->role !== Role::Parent) {
+            return null;
+        }
+
+        $guardian = $user->guardian;
+
+        if ($guardian === null) {
+            return null;
+        }
+
+        return ['unread_count' => $guardian->unreadNotifications()->count()];
+    }
+
+    /**
      * @return array{name: string, logo_url: string|null}
      */
     private function schoolPayload(): array
@@ -89,9 +112,8 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * The role-aware sidebar navigation. Items flagged coming_soon form the
-     * final per-role information architecture; each flips to a live href as
-     * its page ships (STEPS.md steps 14-23).
+     * The role-aware sidebar navigation. The coming_soon flag stays in the
+     * payload for shape stability; every v1 item is live (STEPS.md steps 14-23).
      *
      * @return list<array{label: string|null, items: list<array{key: string, title: string, href: string|null, coming_soon: bool}>}>
      */
@@ -153,13 +175,6 @@ class HandleInertiaRequests extends Middleware
             'coming_soon' => false,
         ];
 
-        $soon = fn (string $key, string $title): array => [
-            'key' => $key,
-            'title' => $title,
-            'href' => null,
-            'coming_soon' => true,
-        ];
-
         return match ($role) {
             Role::Admin => [
                 ['label' => null, 'items' => [$dashboard]],
@@ -203,19 +218,59 @@ class HandleInertiaRequests extends Middleware
             Role::Student => [
                 ['label' => null, 'items' => [$dashboard]],
                 ['label' => 'Belajar', 'items' => [
-                    $soon('schedule', 'Jadwal'),
-                    $soon('attendance', 'Presensi'),
-                    $soon('grades', 'Nilai'),
-                    $soon('report-card', 'Rapor'),
+                    [
+                        'key' => 'schedule',
+                        'title' => 'Jadwal',
+                        'href' => route('student.schedule.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'attendance',
+                        'title' => 'Presensi',
+                        'href' => route('student.attendance.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'grades',
+                        'title' => 'Nilai',
+                        'href' => route('student.grades.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'report-card',
+                        'title' => 'Rapor',
+                        'href' => route('student.report-cards.index'),
+                        'coming_soon' => false,
+                    ],
                 ]],
             ],
             Role::Parent => [
                 ['label' => null, 'items' => [$dashboard]],
                 ['label' => 'Anak', 'items' => [
-                    $soon('schedule', 'Jadwal'),
-                    $soon('attendance', 'Presensi'),
-                    $soon('grades', 'Nilai'),
-                    $soon('report-card', 'Rapor'),
+                    [
+                        'key' => 'schedule',
+                        'title' => 'Jadwal',
+                        'href' => route('guardian.schedule.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'attendance',
+                        'title' => 'Presensi',
+                        'href' => route('guardian.attendance.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'grades',
+                        'title' => 'Nilai',
+                        'href' => route('guardian.grades.index'),
+                        'coming_soon' => false,
+                    ],
+                    [
+                        'key' => 'report-card',
+                        'title' => 'Rapor',
+                        'href' => route('guardian.report-cards.index'),
+                        'coming_soon' => false,
+                    ],
                 ]],
             ],
         };

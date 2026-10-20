@@ -21,7 +21,10 @@ use App\Http\Controllers\Admin\Schedule\TeachingAssignmentController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuardianController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportCardDownloadController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Teacher\AttendanceController;
 use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\HomeroomController;
@@ -116,12 +119,32 @@ Route::middleware(['auth'])->group(function () {
         Route::post('homeroom/{classroom}/ready', [HomeroomController::class, 'storeReady'])->name('homeroom.ready');
     });
 
+    Route::middleware('role:student')->prefix('siswa')->name('student.')->group(function () {
+        Route::get('jadwal', [StudentController::class, 'schedule'])->name('schedule.index');
+        Route::get('kehadiran', [StudentController::class, 'attendance'])->name('attendance.index');
+        Route::get('nilai', [StudentController::class, 'grades'])->name('grades.index');
+    });
+
     Route::middleware('role:student')->prefix('rapor')->name('student.report-cards.')->group(function () {
+        Route::get('', [StudentController::class, 'reportCards'])->name('index');
         Route::get('{semester}/unduh', [ReportCardDownloadController::class, 'student'])->name('download');
     });
 
     Route::middleware('role:parent')->prefix('anak/{student}/rapor')->name('guardian.report-cards.')->group(function () {
         Route::get('{semester}/unduh', [ReportCardDownloadController::class, 'guardian'])->name('download');
+    });
+
+    Route::middleware('role:parent')->prefix('anak')->name('guardian.')->group(function () {
+        Route::get('jadwal', [GuardianController::class, 'schedule'])->name('schedule.index');
+        Route::get('kehadiran', [GuardianController::class, 'attendance'])->name('attendance.index');
+        Route::get('nilai', [GuardianController::class, 'grades'])->name('grades.index');
+        Route::get('rapor', [GuardianController::class, 'reportCards'])->name('report-cards.index');
+    });
+
+    Route::middleware('role:parent')->prefix('notifikasi')->name('notifications.')->group(function () {
+        Route::get('', [NotificationController::class, 'index'])->name('index');
+        Route::patch('baca-semua', [NotificationController::class, 'markAllRead'])->name('mark-all-read');
+        Route::patch('{notification}/baca', [NotificationController::class, 'markRead'])->name('mark-read');
     });
 
     Route::middleware('role:admin')->prefix('admin/attendance')->name('admin.attendance.')->group(function () {

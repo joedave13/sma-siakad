@@ -63,4 +63,12 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasOne(Teacher::class);
     }
+
+    /**
+     * @return HasOne<Guardian, $this>
+     */
+    public function guardian(): HasOne
+    {
+        return $this->hasOne(Guardian::class);
+    }
 }

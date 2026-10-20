@@ -83,9 +83,28 @@ test('student navigation lists only the learning destinations', function () {
             ->where('nav.1.label', 'Belajar')
             ->has('nav.1.items', 4)
             ->where('nav.1.items.0.key', 'schedule')
-            ->where('nav.1.items.0.href', null)
-            ->where('nav.1.items.0.coming_soon', true)
+            ->where('nav.1.items.0.href', route('student.schedule.index'))
+            ->where('nav.1.items.0.coming_soon', false)
             ->where('nav.1.items.3.key', 'report-card')
+            ->where('nav.1.items.3.href', route('student.report-cards.index'))
+            ->where('nav.1.items.3.coming_soon', false)
+        );
+});
+
+test('parent navigation lists only the child destinations', function () {
+    $this->actingAs(User::factory()->asRole(Role::Parent)->create())
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('nav', 2)
+            ->where('nav.1.label', 'Anak')
+            ->has('nav.1.items', 4)
+            ->where('nav.1.items.0.key', 'schedule')
+            ->where('nav.1.items.0.href', route('guardian.schedule.index'))
+            ->where('nav.1.items.0.coming_soon', false)
+            ->where('nav.1.items.3.key', 'report-card')
+            ->where('nav.1.items.3.href', route('guardian.report-cards.index'))
+            ->where('nav.1.items.3.coming_soon', false)
         );
 });
 

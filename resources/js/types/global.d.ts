@@ -1,6 +1,7 @@
 import type { Directive } from 'vue';
 import type { Auth } from '@/types/auth';
 import type { SidebarNavGroup } from '@/types/navigation';
+import type { NotificationsShared } from '@/types/read';
 import type { SchoolBrand } from '@/types/ui';
 
 // Extend ImportMeta interface for Vite...
@@ -23,6 +24,7 @@ declare module '@inertiajs/core' {
             auth: Auth;
             school: SchoolBrand;
             nav: SidebarNavGroup[];
+            notifications: NotificationsShared;
             sidebarOpen: boolean;
             [key: string]: unknown;
         };
