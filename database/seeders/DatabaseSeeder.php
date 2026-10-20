@@ -16,5 +16,9 @@ class DatabaseSeeder extends Seeder
             LessonPeriodSeeder::class,
             AcademicSettingSeeder::class,
         ]);
+
+        if (app()->isLocal()) {
+            $this->call(DemoDataSeeder::class);
+        }
     }
 }
