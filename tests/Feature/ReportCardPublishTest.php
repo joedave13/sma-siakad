@@ -141,7 +141,7 @@ it('blocks publish listing students with missing components', function (): void 
         ->update(['score' => null]);
 
     expect(fn () => app(PublishService::class)->publish($semester, $admin))
-        ->toThrow(ValidationException::class, 'Budi Hartono — Nilai belum lengkap: Informatika (Quiz).');
+        ->toThrow(ValidationException::class, 'Budi Hartono - Nilai belum lengkap: Informatika (Quiz).');
 });
 
 it('bulk generation queues ready students and marks incomplete ones failed with the listing', function (): void {

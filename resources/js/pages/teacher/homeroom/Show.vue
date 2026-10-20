@@ -221,7 +221,7 @@ function markReady(): void {
                                 }})
                             </Badge>
                             <Badge v-else variant="outline">
-                                {{ grade.subject }}: —
+                                {{ grade.subject }}: -
                             </Badge>
                         </template>
                         <Badge

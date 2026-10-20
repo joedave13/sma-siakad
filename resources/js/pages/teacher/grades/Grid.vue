@@ -405,7 +405,7 @@ function save(): void {
                                     class="font-medium"
                                     :data-test="`grade-final-${student.id}`"
                                 >
-                                    {{ finalPreview(student.id) ?? '—' }}
+                                    {{ finalPreview(student.id) ?? '-' }}
                                 </span>
                             </td>
                             <td class="px-2 py-1.5">

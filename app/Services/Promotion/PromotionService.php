@@ -161,7 +161,7 @@ class PromotionService
     /**
      * Apply the draft batch: enroll every student into their target classroom.
      *
-     * Idempotent — applying twice is a no-op. Blocked while any semester of
+     * Idempotent - applying twice is a no-op. Blocked while any semester of
      * the from-year is unlocked or any non-graduate row has no target class.
      *
      * @throws ValidationException

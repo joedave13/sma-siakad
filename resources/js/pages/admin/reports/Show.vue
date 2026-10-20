@@ -365,7 +365,7 @@ watch(
                 </div>
 
                 <span v-else-if="column.key === 'generated_at'">
-                    {{ row.generated_at ?? '—' }}
+                    {{ row.generated_at ?? '-' }}
                 </span>
             </template>
         </DataTable>

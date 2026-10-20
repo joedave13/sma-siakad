@@ -75,7 +75,7 @@ const columns = [
                     </template>
 
                     <template v-else-if="column.key === 'score'">
-                        {{ (row as GradesRow).score ?? '—' }}
+                        {{ (row as GradesRow).score ?? '-' }}
                     </template>
 
                     <template v-else-if="column.key === 'status'">

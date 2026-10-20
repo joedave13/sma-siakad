@@ -395,7 +395,7 @@ function targetOptions(
                         v-if="column.key === 'full_name'"
                         :data-test="`promotion-student-${row.student_id}`"
                     >
-                        {{ row.full_name ?? '—' }}
+                        {{ row.full_name ?? '-' }}
                     </div>
 
                     <Badge
@@ -407,7 +407,7 @@ function targetOptions(
                     </Badge>
 
                     <span v-else-if="column.key === 'to_class'">
-                        {{ row.to_class ?? '—' }}
+                        {{ row.to_class ?? '-' }}
                     </span>
 
                     <div v-else-if="column.key === 'override'">
@@ -418,7 +418,7 @@ function targetOptions(
                         >
                             Diubah
                         </Badge>
-                        <span v-else class="text-muted-foreground">—</span>
+                        <span v-else class="text-muted-foreground">-</span>
                     </div>
 
                     <div

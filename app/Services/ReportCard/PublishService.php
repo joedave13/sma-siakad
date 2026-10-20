@@ -162,7 +162,7 @@ class PublishService
         if ($blockers !== []) {
             $listing = collect($blockers)
                 ->take(5)
-                ->map(fn (array $blocker): string => $blocker['student'].' — '.$blocker['reason'])
+                ->map(fn (array $blocker): string => $blocker['student'].' - '.$blocker['reason'])
                 ->implode('; ');
 
             throw ValidationException::withMessages([

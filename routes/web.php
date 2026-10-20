@@ -30,7 +30,7 @@ use App\Http\Controllers\Teacher\GradeController;
 use App\Http\Controllers\Teacher\HomeroomController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')->name('home');
+Route::redirect('/', 'dashboard')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
