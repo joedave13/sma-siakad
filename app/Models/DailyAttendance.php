@@ -6,7 +6,14 @@ use App\Enums\AttendanceStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property Carbon $date
+ * @property AttendanceStatus $status
+ * @property bool $is_late
+ * @property bool $is_overridden
+ */
 #[Fillable(['student_id', 'date', 'status', 'is_late', 'is_overridden', 'computed_at'])]
 class DailyAttendance extends Model
 {

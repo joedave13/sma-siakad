@@ -38,7 +38,11 @@ defineProps<{ reportCards: ReportCardsPayload }>();
             </li>
         </ul>
 
-        <div v-else class="rounded-lg border p-6" data-test="report-cards-empty">
+        <div
+            v-else
+            class="rounded-lg border p-6"
+            data-test="report-cards-empty"
+        >
             <EmptyState
                 title="Belum ada rapor yang diterbitkan"
                 description="Rapor tampil di sini setelah admin menerbitkan rapor semester terkait. Pantau halaman ini secara berkala."

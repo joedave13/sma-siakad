@@ -30,7 +30,10 @@ defineProps<{
         description="Jadwal pelajaran mingguan anak Anda pada semester berjalan."
     >
         <template #actions>
-            <ChildSwitcher :children="children" :current-child-id="currentChildId" />
+            <ChildSwitcher
+                :children="children"
+                :current-child-id="currentChildId"
+            />
         </template>
     </PageHeader>
 

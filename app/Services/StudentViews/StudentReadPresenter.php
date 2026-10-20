@@ -121,14 +121,14 @@ class StudentReadPresenter
             ->groupBy(fn (Attendance $attendance): string => $attendance->attendanceSession->date->toDateString());
 
         $payload['summary'] = $this->snapshotBuilder->attendanceSummary($student, $semester);
-        $payload['days'] = $daily
+        $payload['days'] = array_values($daily
             ->map(fn (DailyAttendance $day): array => [
                 'date' => $day->date->toDateString(),
                 'status' => $day->status->value,
                 'status_label' => $day->is_late ? 'Hadir (Terlambat)' : $day->status->label(),
                 'is_late' => (bool) $day->is_late,
                 'is_overridden' => (bool) $day->is_overridden,
-                'periods' => ($periodsByDate->get($day->date->toDateString()) ?? collect())
+                'periods' => array_values(($periodsByDate->get($day->date->toDateString()) ?? collect())
                     ->sortBy(fn (Attendance $attendance) => $attendance->attendanceSession->schedule->lessonPeriod->number)
                     ->values()
                     ->map(fn (Attendance $attendance): array => [
@@ -137,9 +137,9 @@ class StudentReadPresenter
                         'status_label' => $attendance->status->label(),
                         'note' => $attendance->note,
                     ])
-                    ->all(),
+                    ->all()),
             ])
-            ->all();
+            ->all());
 
         return $payload;
     }
@@ -184,7 +184,7 @@ class StudentReadPresenter
             ->with('subject')
             ->get();
 
-        $payload['rows'] = $assignments
+        $payload['rows'] = array_values($assignments
             ->map(function ($assignment) use ($student): array {
                 $entries = GradeEntry::query()
                     ->where('teaching_assignment_id', $assignment->getKey())
@@ -205,13 +205,13 @@ class StudentReadPresenter
                     'kkm' => $kkm,
                     'predicate' => $score === null ? '-' : $this->snapshotBuilder->predicateFor($score, $kkm),
                     'passed' => $score !== null && $score >= $kkm,
-                    'missing' => array_map(
+                    'missing' => array_values(array_map(
                         fn ($component) => $component->label(),
                         $this->calculator->missingComponents($entries),
-                    ),
+                    )),
                 ];
             })
-            ->all();
+            ->all());
 
         return $payload;
     }
@@ -223,7 +223,7 @@ class StudentReadPresenter
      */
     public function reportCards(Student $student, bool $forGuardian): array
     {
-        $rows = $student->reportCards()
+        $rows = array_values($student->reportCards()
             ->whereNotNull('published_at')
             ->with('semester.academicYear')
             ->get()
@@ -238,7 +238,7 @@ class StudentReadPresenter
                     ? route('guardian.report-cards.download', [$student, $reportCard->semester])
                     : route('student.report-cards.download', $reportCard->semester),
             ])
-            ->all();
+            ->all());
 
         return ['rows' => $rows];
     }
@@ -249,9 +249,9 @@ class StudentReadPresenter
      */
     private function groupSchedulesByDay(Collection $schedules): array
     {
-        return collect(DayOfWeek::cases())
+        return array_values(collect(DayOfWeek::cases())
             ->map(function (DayOfWeek $day) use ($schedules): ?array {
-                $periods = $schedules
+                $periods = array_values($schedules
                     ->filter(fn (Schedule $schedule): bool => $schedule->day_of_week === $day)
                     ->sortBy(fn (Schedule $schedule): int => $schedule->lessonPeriod->number)
                     ->values()
@@ -262,7 +262,7 @@ class StudentReadPresenter
                         'subject' => $schedule->teachingAssignment->subject->name,
                         'teacher' => $schedule->teachingAssignment->teacher->full_name,
                     ])
-                    ->all();
+                    ->all());
 
                 if ($periods === []) {
                     return null;
@@ -272,6 +272,6 @@ class StudentReadPresenter
             })
             ->filter()
             ->values()
-            ->all();
+            ->all());
     }
 }

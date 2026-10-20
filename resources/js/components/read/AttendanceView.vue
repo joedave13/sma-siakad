@@ -137,7 +137,7 @@ const statusVariant = (status: string): BadgeVariant => {
                             :data-test="`attendance-period-${day.date}-${period.period_number}`"
                         >
                             <span
-                                class="w-8 shrink-0 text-sm tabular-nums text-muted-foreground"
+                                class="w-8 shrink-0 text-sm text-muted-foreground tabular-nums"
                                 >{{ period.period_number }}</span
                             >
                             <span class="grow text-sm">{{
@@ -156,7 +156,11 @@ const statusVariant = (status: string): BadgeVariant => {
                 </div>
             </div>
 
-            <div v-else class="rounded-lg border p-6" data-test="attendance-empty">
+            <div
+                v-else
+                class="rounded-lg border p-6"
+                data-test="attendance-empty"
+            >
                 <EmptyState
                     title="Belum ada riwayat presensi"
                     description="Riwayat harian akan muncul setelah wali kelas mengisi presensi Anda pada semester ini."

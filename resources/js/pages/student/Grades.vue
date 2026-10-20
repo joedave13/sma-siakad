@@ -7,9 +7,7 @@ import type { GradesPayload } from '@/types/read';
 
 defineOptions({
     layout: {
-        breadcrumbs: [
-            { title: 'Nilai', href: studentGradesRoutes.index() },
-        ],
+        breadcrumbs: [{ title: 'Nilai', href: studentGradesRoutes.index() }],
     },
 });
 

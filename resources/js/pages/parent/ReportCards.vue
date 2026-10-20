@@ -30,7 +30,10 @@ defineProps<{
         description="Rapor semester anak Anda yang sudah diterbitkan, siap diunduh."
     >
         <template #actions>
-            <ChildSwitcher :children="children" :current-child-id="currentChildId" />
+            <ChildSwitcher
+                :children="children"
+                :current-child-id="currentChildId"
+            />
         </template>
     </PageHeader>
 

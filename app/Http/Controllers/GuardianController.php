@@ -82,7 +82,7 @@ class GuardianController extends Controller
         }
 
         abort_unless(
-            is_string($requested) || is_int($requested),
+            is_string($requested),
             403,
             'Anda tidak memiliki akses ke data siswa tersebut.',
         );
@@ -104,14 +104,13 @@ class GuardianController extends Controller
         $year = AcademicYear::query()->where('is_active', true)->first();
 
         return [
-            'children' => $guardian->students
+            'children' => array_values($guardian->students
                 ->map(fn (Student $student): array => [
                     'id' => $student->getKey(),
                     'name' => $student->full_name,
                     'classroom' => $year !== null ? $student->classroomIn($year->id)?->name : null,
                 ])
-                ->values()
-                ->all(),
+                ->all()),
             'currentChildId' => $child?->getKey(),
         ];
     }

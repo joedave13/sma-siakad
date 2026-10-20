@@ -75,11 +75,11 @@ defineProps<{ schedule: SchedulePayload }>();
                             :data-test="`schedule-period-${day.day}-${period.period_number}`"
                         >
                             <span
-                                class="w-8 shrink-0 text-sm font-medium tabular-nums text-muted-foreground"
+                                class="w-8 shrink-0 text-sm font-medium text-muted-foreground tabular-nums"
                                 >{{ period.period_number }}</span
                             >
                             <span
-                                class="w-32 shrink-0 text-sm tabular-nums text-muted-foreground"
+                                class="w-32 shrink-0 text-sm text-muted-foreground tabular-nums"
                                 >{{ period.start_time }}–{{
                                     period.end_time
                                 }}</span

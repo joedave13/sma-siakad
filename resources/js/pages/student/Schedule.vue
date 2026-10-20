@@ -7,9 +7,7 @@ import type { SchedulePayload } from '@/types/read';
 
 defineOptions({
     layout: {
-        breadcrumbs: [
-            { title: 'Jadwal', href: studentScheduleRoutes.index() },
-        ],
+        breadcrumbs: [{ title: 'Jadwal', href: studentScheduleRoutes.index() }],
     },
 });
 

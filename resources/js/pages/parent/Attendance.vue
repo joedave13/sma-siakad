@@ -30,7 +30,10 @@ defineProps<{
         description="Riwayat kehadiran harian dan per jam pelajaran anak Anda."
     >
         <template #actions>
-            <ChildSwitcher :children="children" :current-child-id="currentChildId" />
+            <ChildSwitcher
+                :children="children"
+                :current-child-id="currentChildId"
+            />
         </template>
     </PageHeader>
 

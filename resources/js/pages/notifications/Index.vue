@@ -23,9 +23,7 @@ defineProps<{
 
 const page = usePage();
 
-const unreadCount = computed(
-    () => page.props.notifications?.unread_count ?? 0,
-);
+const unreadCount = computed(() => page.props.notifications?.unread_count ?? 0);
 
 const visit = (url: string): void => {
     router.get(url, {}, { preserveScroll: true });
@@ -40,7 +38,11 @@ const markRead = (id: string): void => {
 };
 
 const markAllRead = (): void => {
-    router.patch(notificationsRoutes.markAllRead.url(), {}, { preserveScroll: true });
+    router.patch(
+        notificationsRoutes.markAllRead.url(),
+        {},
+        { preserveScroll: true },
+    );
 };
 </script>
 
@@ -88,10 +90,7 @@ const markAllRead = (): void => {
                         {{ item.created_at }}
                     </p>
                 </div>
-                <div
-                    v-if="!item.read"
-                    class="flex shrink-0 items-center gap-2"
-                >
+                <div v-if="!item.read" class="flex shrink-0 items-center gap-2">
                     <Badge
                         variant="secondary"
                         data-test="notification-unread-badge"
@@ -110,7 +109,11 @@ const markAllRead = (): void => {
             </li>
         </ul>
 
-        <div v-else class="rounded-lg border p-6" data-test="notifications-empty">
+        <div
+            v-else
+            class="rounded-lg border p-6"
+            data-test="notifications-empty"
+        >
             <EmptyState
                 title="Belum ada notifikasi"
                 description="Notifikasi presensi harian anak Anda akan muncul di sini setiap hari sekolah."
