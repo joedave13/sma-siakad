@@ -28,43 +28,25 @@ const displayValue = (row: T, key: string): string => {
     <div class="w-full overflow-x-auto rounded-lg border border-border">
         <table class="w-full text-sm">
             <thead>
-                <tr
-                    class="border-b border-border bg-muted/40 text-left text-muted-foreground"
-                >
-                    <th
-                        v-for="column in columns"
-                        :key="column.key"
-                        scope="col"
-                        class="px-4 py-2.5 font-medium"
-                        :class="column.className"
-                    >
+                <tr class="border-b border-border bg-muted/40 text-left text-muted-foreground">
+                    <th v-for="column in columns" :key="column.key" scope="col" class="px-4 py-2.5 font-medium"
+                        :class="column.className">
                         {{ column.label }}
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr
-                    v-for="row in rows"
-                    :key="rowKey(row)"
-                    class="border-b border-border/60 last:border-0"
-                >
-                    <td
-                        v-for="column in columns"
-                        :key="column.key"
-                        class="px-4 py-2.5 align-top"
-                        :class="column.className"
-                    >
+                <tr v-for="row in rows" :key="rowKey(row)" class="border-b border-border/60 last:border-0">
+                    <td v-for="column in columns" :key="column.key" class="px-4 py-2.5 align-middle"
+                        :class="column.className">
                         <slot name="cell" :row="row" :column="column">{{
                             displayValue(row, column.key)
-                        }}</slot>
+                            }}</slot>
                     </td>
                 </tr>
                 <tr v-if="rows.length === 0">
                     <td :colspan="columns.length" class="px-4 py-6">
-                        <EmptyState
-                            :title="emptyTitle"
-                            :description="emptyDescription"
-                        />
+                        <EmptyState :title="emptyTitle" :description="emptyDescription" />
                     </td>
                 </tr>
             </tbody>
